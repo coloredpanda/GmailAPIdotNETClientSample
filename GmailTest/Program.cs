@@ -10,55 +10,56 @@ using Google.Apis.Services;
 
 namespace GmailTest
 {
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            try
-            {
-                new Program().ListLabels().Wait();
-            }
-            catch (AggregateException ex)
-            {
-                foreach (var e in ex.InnerExceptions)
-                {
-                    Console.WriteLine("Exception: " + e.Message);
-                }
-            }
+	class Program
+	{
+		static void Main(string[] args)
+		{
+			try
+			{
+				new Program().ListLabels().Wait();
+			}
+			catch (AggregateException ex)
+			{
+				foreach (var e in ex.InnerExceptions)
+				{
+					Console.WriteLine("Exception: " + e.Message);
+				}
+			}
 
-            Console.ReadKey();
-        }
+			Console.ReadKey();
+		}
 
-        public async Task ListLabels()
-        {
+		public async Task ListLabels()
+		{
 
-            UserCredential credential;
-            using (var stream = new FileStream("client_secrets_desktop.json", FileMode.Open, FileAccess.Read))
-            {
-                credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(GoogleClientSecrets.Load(stream).Secrets,
-                    new[] { GmailService.Scope.GmailReadonly },
-                    "user", CancellationToken.None);
-            }
-          
-            var service = new GmailService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = "Gmail Test",
-            });
+			UserCredential credential;
+			using (var stream = new FileStream("client_secrets_desktop.json", FileMode.Open, FileAccess.Read))
+			{
+				credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
+					GoogleClientSecrets.Load(stream).Secrets,
+					new[] { GmailService.Scope.GmailReadonly },
+					"user", CancellationToken.None);
+			}
 
-            try
-            {
-                ListLabelsResponse response = service.Users.Labels.List("me").Execute();
-                foreach (Label label in response.Labels.OrderBy(p=>p.Name))
-                {
-                    Console.WriteLine(label.Id + " - " + label.Name);
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("An error occurred: " + e.Message);
-            }
-        }
-        
-    }
+			var service = new GmailService(new BaseClientService.Initializer()
+			{
+				HttpClientInitializer = credential,
+				ApplicationName = "Gmail Test",
+			});
+
+			try
+			{
+				ListLabelsResponse response = service.Users.Labels.List("me").Execute();
+				foreach (Label label in response.Labels.OrderBy(p => p.Name))
+				{
+					Console.WriteLine(label.Id + " - " + label.Name);
+				}
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine("An error occurred: " + e.Message);
+			}
+		}
+
+	}
 }
